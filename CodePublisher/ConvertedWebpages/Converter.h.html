@@ -1,0 +1,60 @@
+<DOCTYPE !HTML>
+<html>
+  <head>
+    <Title>Converter.h</Title>
+    <style>
+      body {
+        padding:15px 40px;
+        font-family: Consolas;
+        font-size: 1.25em;
+        font-weight: normal;
+      }
+      </style>
+  </head>
+
+  <body>
+    <pre>
+#pragma once
+
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;fstream&gt;
+#include "../DependencyTable/DependencyTable.h"
+
+class CodeConverter
+{
+public:
+	CodeConverter();
+	CodeConverter(const DependencyTable& dt);
+
+	const std::string& outputDir() const;
+	void outputDir(const std::string& dir);
+	bool createOutputDir();
+
+	void setDepTable(const DependencyTable& dt);
+
+	std::vector&lt;std::string&gt; convert();
+	std::string convert(const std::string& filepath);
+	std::vector&lt;std::string&gt; convert(const std::vector&lt;std::string&gt;& files);
+
+	const std::vector&lt;std::string&gt; convertedFiles() const;
+
+	void clear();
+
+private:
+	bool convertFile(std::string file);
+	void addPreCodeHTML(const std::string& title);
+	void addPreTag();
+	void addDependencyLinks(std::string file);
+	void addClosingTags();
+	void skipSpecialChars(std::string& line);
+
+private:
+	DependencyTable dt_;
+	std::string outputDir_ = "..\\ConvertedWebpages\\";
+	std::vector&lt;std::string&gt; convertedFiles_;
+	std::ofstream out_;
+};
+    </pre>
+  </body>
+</html>

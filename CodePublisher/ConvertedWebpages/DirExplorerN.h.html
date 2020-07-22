@@ -1,0 +1,56 @@
+<DOCTYPE !HTML>
+<html>
+  <head>
+    <Title>DirExplorerN.h</Title>
+    <style>
+      body {
+        padding:15px 40px;
+        font-family: Consolas;
+        font-size: 1.25em;
+        font-weight: normal;
+      }
+      </style>
+  </head>
+
+  <body>
+    <pre>
+#pragma once
+
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include "../FileSystem/FileSystem.h"
+
+class DirExplorerN
+{
+public:
+    using patterns = std::vector&lt;std::string&gt;;
+    using files = std::vector&lt;std::string&gt;;
+
+    DirExplorerN(const std::string& path);
+
+    void addPattern(const std::string& patt);
+    void recurse(bool doRecurse = true);
+
+    bool search();
+    void find(const std::string& path);
+    bool match_regexes(const std::vector&lt;std::string&gt;& regexes);
+
+    void doFile(const std::string& dir, const std::string& filename);
+    void doDir(const std::string& dirname);
+
+    const files& filesList() const;
+    size_t fileCount();
+    size_t dirCount();
+    void showStats();
+
+private:
+    std::string path_;
+    patterns patterns_;
+    files files_;
+    size_t dirCount_ = 0;
+    size_t fileCount_ = 0;
+    bool recurse_ = false;
+};
+    </pre>
+  </body>
+</html>

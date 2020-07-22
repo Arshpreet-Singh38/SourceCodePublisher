@@ -1,0 +1,200 @@
+<DOCTYPE !HTML>
+<html>
+  <head>
+    <Title>Converter.cpp</Title>
+    <style>
+      body {
+        padding:15px 40px;
+        font-family: Consolas;
+        font-size: 1.25em;
+        font-weight: normal;
+      }
+      </style>
+  </head>
+
+  <body>
+    <pre>
+#include &lt;iostream&gt;
+#include "Converter.h"
+#include "../FileSystem/FileSystem.h"
+#include "../DependencyTable/DependencyTable.cpp"
+
+CodeConverter::CodeConverter()
+{
+}
+
+CodeConverter::CodeConverter(const DependencyTable& dt) : dt_(dt)
+{
+}
+
+void CodeConverter::setDepTable(const DependencyTable& dt)
+{
+    dt_ = dt;
+}
+
+std::vector&lt;std::string&gt; CodeConverter::convert()
+{
+    if (!createOutputDir()) {
+        return std::vector&lt;std::string&gt;();
+    }
+
+    for (auto entry : dt_) {
+        if (convertFile(entry.first)) {
+            std::cout &lt;&lt; std::endl;
+            std::cout &lt;&lt; "Converted: ";
+        }
+        else {
+            std::cout &lt;&lt; "Failed";
+        }
+        std::cout &lt;&lt; entry.first &lt;&lt; std::endl;
+        std::string filename = Path::getName(entry.first);
+    }
+    return convertedFiles_;
+}
+
+std::string CodeConverter::convert(const std::string& filepath)
+{
+    if (!createOutputDir()) {
+        return "";
+    }
+
+    if (convertFile(filepath)) {
+    }
+    else {
+    }
+
+    std::string filename = Path::getName(filepath);
+    return filename + ".html";
+}
+
+std::vector&lt;std::string&gt; CodeConverter::convert(const std::vector&lt;std::string&gt;& files)
+{
+    clear();
+    dt_ = DependencyTable(files);
+    return convert();
+}
+
+const std::string& CodeConverter::outputDir() const
+{
+    return outputDir_;
+}
+
+void CodeConverter::outputDir(const std::string& dir)
+{
+    outputDir_ = dir;
+}
+
+bool CodeConverter::createOutputDir()
+{
+    if (!Directory::exists(outputDir_)) {
+        return Directory::create(outputDir_);
+    }
+    return true;
+}
+
+const std::vector&lt;std::string&gt; CodeConverter::convertedFiles() const
+{
+    return convertedFiles_;
+}
+
+void CodeConverter::clear()
+{
+    convertedFiles_.clear();
+    dt_.clear();
+}
+
+bool CodeConverter::convertFile(std::string file)
+{
+    std::ifstream in(file);
+    if (!in.is_open() || !in.good()) {
+        in.close();
+        return false;
+    }
+
+    std::string filename = Path::getName(file);
+    std::string outputPath = outputDir_ + filename + ".html";
+    out_.open(outputPath, std::ofstream::out);
+    if (!out_.is_open() || !out_.good()) {
+        in.close();
+        return false;
+    }
+
+    addPreCodeHTML(filename);
+    addDependencyLinks(file);
+    addPreTag();
+
+    while (in.good()) {
+        std::string line;
+        while (std::getline(in, line)) {
+            skipSpecialChars(line);
+            out_ &lt;&lt; line &lt;&lt; std::endl;
+        }
+    }
+
+    addClosingTags();
+    out_.close();
+
+    convertedFiles_.push_back(outputPath);
+    return true;
+}
+
+void CodeConverter::addPreCodeHTML(const std::string& title)
+{
+    out_ &lt;&lt; "&lt;DOCTYPE !HTML&gt;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "&lt;html&gt;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "  &lt;head&gt;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "    &lt;Title&gt;" &lt;&lt; title &lt;&lt; "&lt;/Title&gt;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "    &lt;style&gt;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "      body {" &lt;&lt; std::endl;
+    out_ &lt;&lt; "        padding:15px 40px;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "        font-family: Consolas;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "        font-size: 1.25em;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "        font-weight: normal;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "      }" &lt;&lt; std::endl;
+    out_ &lt;&lt; "      &lt;/style&gt;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "  &lt;/head&gt;" &lt;&lt; std::endl &lt;&lt; std::endl;
+    out_ &lt;&lt; "  &lt;body&gt;" &lt;&lt; std::endl;
+}
+
+void CodeConverter::addPreTag()
+{
+    out_ &lt;&lt; "    &lt;pre&gt;" &lt;&lt; std::endl;
+}
+
+void CodeConverter::addDependencyLinks(std::string file)
+{
+    std::string filename = Path::getName(file);
+    if (!dt_.has(file)) {
+        return;
+    }
+
+    if (dt_[file].size() == 0) {
+        return;
+    }
+
+    out_ &lt;&lt; "    &lt;h3&gt;Dependencies: " &lt;&lt; std::endl;
+    for (auto dep : dt_[file]) {
+        out_ &lt;&lt; "      &lt;a href=\"" &lt;&lt; Path::getName(dep) &lt;&lt; ".html\"&gt;" &lt;&lt; Path::getName(dep) &lt;&lt; "&lt;/a&gt;" &lt;&lt; std::endl;
+    }
+    out_ &lt;&lt; "    &lt;/h3&gt;";
+}
+
+void CodeConverter::addClosingTags()
+{
+    out_ &lt;&lt; "    &lt;/pre&gt;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "  &lt;/body&gt;" &lt;&lt; std::endl;
+    out_ &lt;&lt; "&lt;/html&gt;" &lt;&lt; std::endl;
+}
+
+void CodeConverter::skipSpecialChars(std::string& line)
+{
+    size_t pos = line.npos;
+    while ((pos = line.find('&lt;')) != line.npos)
+        line.replace(pos, 1, "&lt;");
+
+    while ((pos = line.find('&gt;')) != line.npos)
+        line.replace(pos, 1, "&gt;");
+}
+    </pre>
+  </body>
+</html>

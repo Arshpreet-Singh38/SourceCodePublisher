@@ -1,0 +1,44 @@
+<DOCTYPE !HTML>
+<html>
+  <head>
+    <Title>CodePublisher.h</Title>
+    <style>
+      body {
+        padding:15px 40px;
+        font-family: Consolas;
+        font-size: 1.25em;
+        font-weight: normal;
+      }
+      </style>
+  </head>
+
+  <body>
+    <pre>
+#pragma once
+
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include "../CodeUtilities/CodeUtilities.h"
+#include "../Converter/Converter.h"
+#include "../Display/Display.h"
+
+class CodePublisher
+{
+public:
+	CodePublisher();
+	bool processCommandLineArgs(int argc, char** argv);
+	bool extractFiles();
+	void publish();
+
+private:
+	Utilities::ProcessCmdLine* pcl_;
+	CodeConverter cconv_;
+	Display display_;
+
+	std::string dirIn_;
+	std::string dirOut_;
+	std::vector&lt;std::string&gt; files_;
+};
+    </pre>
+  </body>
+</html>
