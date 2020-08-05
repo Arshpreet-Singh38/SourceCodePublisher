@@ -19,12 +19,13 @@ Overview:
   
 ===============================================================
 
-*****The application is developed in Microsoft Visual Studio 2019 C++ ******
+*The application is developed in Microsoft Visual Studio 2019 C++ *
   
 ===============================================================
+  
   How to run the application?
   
   - compile.bat : compiles all the packages.
   - run.bat : Used to run the application.
   
- ==============================================================
+ ===============================================================
