@@ -1,5 +1,5 @@
 Source Code Publisher
-==========================================================================================
+==============================================================
 Overview:
 
 - This application takes a path, patterns (*.h, *.cpp) and regex ([A-D](.*)) as input and 
@@ -17,14 +17,14 @@ Overview:
   it waits for the window to be killed to pop-up the next file in the browser which
   is done through processes.
   
-===========================================================================================
+===============================================================
 
-***********The application is developed in Microsoft Visual Studio 2019 C++ ***************
+*****The application is developed in Microsoft Visual Studio 2019 C++ ******
   
-===========================================================================================
+===============================================================
   How to run the application?
   
   - compile.bat : compiles all the packages.
   - run.bat : Used to run the application.
   
- ==========================================================================================
+ ==============================================================
